@@ -87,7 +87,7 @@ void navigateGrid(void)
 				if (SensorValue(lightSensor) < 40)
 				{
 					//In a black Cell
-					updateObstacleMap(currentColumn, currentRow, direction);
+					updateObstacleMap();
 					//Need to avoid obstacle
 					changeDirection();
 				}//end if

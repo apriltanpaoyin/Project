@@ -14,7 +14,7 @@ void reverse(void);
 void moveToCentre(void);
 void moveToEdge(void);
 void changeDirection(void);
-void updateObstacleMap(int currentColumn, int currentRow, int direction);
+void updateObstacleMap(void);
 //int checkCellColour(int threshold);
 void navigateGrid(void);
 void left(void);
@@ -42,18 +42,18 @@ int lastTurn = 4;
 task main()
 {
 	thresholdValue = 40;
-
+	int i, j;
+	
 	nMotorPIDSpeedCtrl[motorB] = mtrSpeedReg;
 	nMotorPIDSpeedCtrl[motorC] = mtrSpeedReg;
 
 	while(true)
 	{
-		// 0 is white cell, 1 is black cell, 99 is start
-
+		// 0 is white, 99 is start
 		// initialise our grid
-		for (int i = 0; i < 7; i++)
+		for(i = 0; i < 7; i++)
 		{
-			for (int j = 0; j < 9; j ++)
+			for(j = 0; j < 9; j++)
 			{
 				grid[i][j] = 0;
 			}
@@ -72,8 +72,6 @@ task main()
 
 void navigateGrid(void)
 {
-		//int cellColour; //1 for black, 0 for white
-
 		while(SensorValue(lightSensor) > 40)
 		{
 			motor[motorB] = 50;
@@ -85,9 +83,6 @@ void navigateGrid(void)
 			{
 				//call moveToEdge()
 				moveToEdge();
-
-				//call checkCellColour() and store the returned value in cellColour
-				//cellColour = checkCellColour(thresholdValue);
 
 				if (SensorValue(lightSensor) < 40)
 				{
@@ -109,32 +104,12 @@ void navigateGrid(void)
 
 }//end navigateGrid()
 
-/*
-int checkCellColour(int threshold)
-{
-	if (SensorValue(lightSensor) < threshold)
-	{
-		// We are in a black Cell
-		nxtDisplayCenteredTextLine(4, "We are in a black cell");
-		wait1Msec(300);
-		return(1);
-	}
-	else
-	{
-		// We are in a white Cell
-		nxtDisplayCenteredTextLine(4, "We are in a white cell");
-		wait1Msec(300);
-		return(0);
-	}
-}*/
-
-void updateObstacleMap(int currentColumn, int currentRow, int direction)
+void updateObstacleMap(void)
 {
 	if (direction == 1)
 		{
 			//If facing north, row above, same column is black
 			grid[currentColumn][currentRow+1] = 1;
-
 		}
 	else if (direction == 2)
 		{

@@ -10,93 +10,247 @@
 const tSensors lightSensor = (tSensors) S2;
 
 //protoypes
-void reverseToCentre();
-void moveToCentre();
-void moveToEdge();
-void changeDirection();
+void reverse(void);
+void moveToCentre(void);
+void moveToEdge(void);
+void changeDirection(void);
 void updateObstacleMap(int currentColumn, int currentRow, int direction);
-int checkCellColour(int threshold);
-void navigateGrid();
+//int checkCellColour(int threshold);
+void navigateGrid(void);
+void left(void);
+void right(void);
 
-// declaring grid
+// declaring grid & global variables
 int grid[7][9];
 int currentColumn = 0;
 int currentRow = 3;
-
+int tleft = 2; //turn left
+int tright = 3; //turn right
+int num; //for random turning left or right
 /* directions:
 	 1 is north
-	 2 is south
-	 3 is east
+	 3 is south
+	 2 is east
 	 4 is west
 */
 int direction = 3;
-
 int thresholdValue;
-//to help with our random turns, left = 4, right = 6;
+//to help with turns so it wont "array out of bounds", left = 4, right = 6;
 int lastTurn = 4;
 
 
 task main()
 {
-
-	int num; //for random turning left or right
+	thresholdValue = 40;
 
 	nMotorPIDSpeedCtrl[motorB] = mtrSpeedReg;
 	nMotorPIDSpeedCtrl[motorC] = mtrSpeedReg;
-	
+
 	while(true)
 	{
 		// 0 is white cell, 1 is black cell, 99 is start
 
 		// initialise our grid
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 7; i++)
 		{
-			for (int j = 0; i < 4; i ++)
+			for (int j = 0; j < 9; j ++)
 			{
 				grid[i][j] = 0;
 			}
 		}
 		grid[0][3] = 99;
-	
-	
+
+
 		while(1==1)
 		{
 			navigateGrid();
 		}//while(1==1)
-		
+
+	}//while(true)
+
 }//end main()
 
-void navigateGrid()
+void navigateGrid(void)
 {
-		int cellColour; //1 for black, 0 for white
-		
-		//call moveToEdge()
-		moveToEdge();
-		
-		//call 
-		cellColour = checkCellColour(thresholdValue);
+		//int cellColour; //1 for black, 0 for white
 
-		if (cellColour == 1)
+		while(SensorValue(lightSensor) > 40)
 		{
-			// We are in a black Cell
-			updateObstacleMap(currentColumn, currentRow, direction);
-			// Need to avoid obstacle
-			reverseToCentre();
-			changeDirection();
+			motor[motorB] = 50;
+			motor[motorC] = 50;
+			wait1Msec(200);
 
-		}
-		else
-		{
-			// We are in a white Cell
-			moveToCentre();
-		}	
+			//when black line
+			while(SensorValue(lightSensor) < 40)
+			{
+				//call moveToEdge()
+				moveToEdge();
+
+				//call checkCellColour() and store the returned value in cellColour
+				//cellColour = checkCellColour(thresholdValue);
+
+				if (SensorValue(lightSensor) < 40)
+				{
+					//In a black Cell
+					updateObstacleMap(currentColumn, currentRow, direction);
+					//Need to avoid obstacle
+					changeDirection();
+				}//end if
+				/*else
+				{
+					// We are in a white Cell
+					moveToCentre();
+					break;
+				}//end else
+			*/
+		}//end while(<40)
+
+	}//end while(>40)
+
 }//end navigateGrid()
 
-void moveToEdge()
+/*
+int checkCellColour(int threshold)
 {
-	motor[motorB]=50;
-	motor[motorC]=50;
-	wait1Msec(250);
-	motor[motorB]=0;
-	motor[motorC]=0;
+	if (SensorValue(lightSensor) < threshold)
+	{
+		// We are in a black Cell
+		nxtDisplayCenteredTextLine(4, "We are in a black cell");
+		wait1Msec(300);
+		return(1);
+	}
+	else
+	{
+		// We are in a white Cell
+		nxtDisplayCenteredTextLine(4, "We are in a white cell");
+		wait1Msec(300);
+		return(0);
+	}
+}*/
+
+void updateObstacleMap(int currentColumn, int currentRow, int direction)
+{
+	if (direction == 1)
+		{
+			//If facing north, row above, same column is black
+			grid[currentColumn][currentRow+1] = 1;
+
+		}
+	else if (direction == 2)
+		{
+			//If facing south, row below, same column is black
+			grid[currentColumn][currentRow-1] = 1;
+		}
+	else if (direction == 3)
+		{
+			//If facing east, same row, next column is black
+			grid[currentColumn+1][currentRow] = 1;
+		}
+	else
+		{
+			//If facing west, same row, previous column is black
+			grid[currentColumn-1][currentRow] = 1;
+		}
 }
+
+void changeDirection()
+{
+	//Reverse back to centre of the cell and change direction
+	reverse();
+	//randomly generate left or right turn
+	//num = rand() % tright + tleft;
+
+	if (lastTurn == 6)
+	{
+		//turn left
+		left();
+		// Change facing direction
+		direction--;
+		if(direction <= 0)
+		{
+			direction = 4;
+		}//end if
+
+		// change lastTurn to be left
+		lastTurn = 4;
+	}//end if
+	else if(lastTurn == 4)
+	{
+		//turn right
+		right();
+		// Change facing direction
+		direction++;
+		if(direction >= 5)
+		{
+			direction = 1;
+		}//end if
+
+		// change lastTurn to be right
+		lastTurn = 6;
+	}//end if
+}
+
+void moveToCentre()
+{
+	nMotorEncoder[motorB] = 0;
+	nMotorEncoder[motorC] = 0;
+	nMotorEncoderTarget[motorB] = 90;
+	nMotorEncoderTarget[motorC] = 90;
+	motor[motorB] = 50;
+	motor[motorC] = 50;
+	wait1Msec(250);
+
+	if (direction == 1)
+	{
+		currentRow = currentRow - 1;
+	}
+	else if (direction == 2)
+	{
+		currentRow = currentRow + 1;
+	}
+	else if (direction == 3)
+	{
+		currentColumn = currentColumn+1;
+	}
+	else
+	{
+		currentColumn = currentColumn-1;
+	}
+	nxtDisplayClearTextLine(4);
+	nxtDisplayCenteredTextLine(4, "Col: %d, Row: %d",currentColumn, currentRow);
+	wait1Msec(250);
+}//end moveToCentre()
+
+void moveToEdge(void)
+{
+	//move a tiny bit
+	nMotorEncoder[motorB] = 0;
+	nMotorEncoder[motorC] = 0;
+	nMotorEncoderTarget[motorB] = 60;
+	nMotorEncoderTarget[motorC] = 60;
+	motor[motorB] = 50;
+	motor[motorC] = 50;
+	wait1Msec(250);
+}//end moveToEdge()
+
+void reverse(void)
+{
+	//reverse a tiny bit
+	motor[motorB] = -50;
+	motor[motorC] = -50;
+	wait1Msec(175);
+}
+
+void left(void)
+{
+	motor[motorB] = -50;
+	motor[motorC] = 50;
+	wait1Msec(324);
+}//end left()
+
+void right(void)
+{
+	motor[motorB] = 50;
+	motor[motorC] = -50;
+	wait1Msec(324);
+}//end right()

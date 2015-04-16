@@ -15,8 +15,8 @@ void moveToCentre(void);
 void moveToEdge(void);
 void changeDirection(void);
 void updateObstacleMap(void);
-//int checkCellColour(int threshold);
 void navigateGrid(void);
+void bounds(void);
 void left(void);
 void right(void);
 
@@ -165,6 +165,13 @@ void changeDirection()
 	}//end if
 }
 
+void bounds()
+{
+	
+}//end bounds()
+
+
+/*
 void moveToCentre()
 {
 	nMotorEncoder[motorB] = 0;
@@ -195,7 +202,7 @@ void moveToCentre()
 	nxtDisplayCenteredTextLine(4, "Col: %d, Row: %d",currentColumn, currentRow);
 	wait1Msec(250);
 }//end moveToCentre()
-
+*/
 void moveToEdge(void)
 {
 	//move a tiny bit

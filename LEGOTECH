@@ -97,7 +97,7 @@ void navigateGrid(void)
 					moveToCentre();
 					break;
 				}//end else
-			*/
+				*/
 		}//end while(<40)
 
 	}//end while(>40)
@@ -132,45 +132,33 @@ void changeDirection()
 {
 	//Reverse back to centre of the cell and change direction
 	reverse();
-	//randomly generate left or right turn
-	//num = rand() % tright + tleft;
-
-	if (lastTurn == 6)
+	
+	randomly generate left or right turn
+	num = rand() % tright + tleft;
+	
+	//check bounds
+	bounds();
+	if (num == 2)
 	{
 		//turn left
 		left();
-		// Change facing direction
-		direction--;
-		if(direction <= 0)
-		{
-			direction = 4;
-		}//end if
-
-		// change lastTurn to be left
-		lastTurn = 4;
 	}//end if
-	else if(lastTurn == 4)
+	else if(num == 3)
 	{
 		//turn right
 		right();
-		// Change facing direction
-		direction++;
-		if(direction >= 5)
-		{
-			direction = 1;
-		}//end if
-
-		// change lastTurn to be right
-		lastTurn = 6;
 	}//end if
 }
-
+/*
 void bounds()
 {
-	
+	if(currentColumn < 0 || currentColumn > 7 || currentRow < 0 || currentRow > 9)
+	{
+		left();
+	}//end if
 }//end bounds()
-
-
+*/
+	
 /*
 void moveToCentre()
 {
@@ -228,6 +216,16 @@ void left(void)
 	motor[motorB] = -50;
 	motor[motorC] = 50;
 	wait1Msec(324);
+	
+	// Change facing direction
+	direction--;
+	if(direction <= 0)
+	{
+		direction = 4;
+	}//end if
+
+	// change lastTurn to be left
+	lastTurn = 4;
 }//end left()
 
 void right(void)
@@ -235,4 +233,14 @@ void right(void)
 	motor[motorB] = 50;
 	motor[motorC] = -50;
 	wait1Msec(324);
+	
+	// Change facing direction
+	direction++;
+	if(direction >= 5)
+	{
+		direction = 1;
+	}//end if
+
+	// change lastTurn to be right
+	lastTurn = 6;
 }//end right()

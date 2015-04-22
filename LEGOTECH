@@ -86,10 +86,14 @@ void navigateGrid(void)
 				{
 					//In a black Cell
 					updateObstacleMap();
-					//check bounds
-					bounds();
-					//Need to avoid obstacle	
-					changeDirection();
+					
+					//facing north
+					while(direction == 1 && currentRow == 8)
+					{
+						changeDirection();
+					}//end while
+					//facing east
+					while(direction == 2 && currentColumn == 10)
 					
 					
 				}//end if

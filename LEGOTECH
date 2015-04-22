@@ -88,13 +88,22 @@ void navigateGrid(void)
 					updateObstacleMap();
 					
 					//facing north
-					while(direction == 1 && currentRow == 8)
+					while(direction == 1 && currentRow == 0)
 					{
 						changeDirection();
 					}//end while
-					//facing east
-					while(direction == 2 && currentColumn == 10)
 					
+					//facing east
+					while(direction == 2 && currentColumn == 11)
+					{
+						changeDirection();
+					}//end while
+					
+					//facing south
+					while(direction == 2 && currentColumn == 10)
+					{
+						changeDirection();
+					}//end while
 					
 				}//end if
 				else

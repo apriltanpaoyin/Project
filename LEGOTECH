@@ -21,9 +21,9 @@ void left(void);
 void right(void);
 
 // declaring grid & global variables
-int grid[7][9];
-int currentColumn = 0;
-int currentRow = 3;
+int grid[9][11];
+int currentColumn = 1;
+int currentRow = 4;
 int tleft = 2; //turn left
 int tright = 3; //turn right
 int num; //for random turning left or right
@@ -44,21 +44,19 @@ task main()
 	thresholdValue = 40;
 	int i, j;
 	
-	nMotorPIDSpeedCtrl[motorB] = mtrSpeedReg;
-	nMotorPIDSpeedCtrl[motorC] = mtrSpeedReg;
 
 	while(true)
 	{
 		// 0 is white, 99 is start
 		// initialise our grid
-		for(i = 0; i < 7; i++)
+		for(i = 0; i < 9; i++)
 		{
-			for(j = 0; j < 9; j++)
+			for(j = 0; j < 11; j++)
 			{
 				grid[i][j] = 0;
 			}
 		}
-		grid[0][3] = 99;
+		grid[1][4] = 99;
 
 
 		while(1==1)
@@ -88,16 +86,20 @@ void navigateGrid(void)
 				{
 					//In a black Cell
 					updateObstacleMap();
-					//Need to avoid obstacle
+					//check bounds
+					bounds();
+					//Need to avoid obstacle	
 					changeDirection();
+					
+					
 				}//end if
-				/*else
+				else
 				{
 					// We are in a white Cell
 					moveToCentre();
 					break;
 				}//end else
-				*/
+				
 		}//end while(<40)
 
 	}//end while(>40)
@@ -113,13 +115,13 @@ void updateObstacleMap(void)
 		}
 	else if (direction == 2)
 		{
-			//If facing south, row below, same column is black
-			grid[currentColumn][currentRow-1] = 1;
+			//If facing east, same row, next column is black
+			grid[currentColumn+1][currentRow] = 1;
 		}
 	else if (direction == 3)
 		{
-			//If facing east, same row, next column is black
-			grid[currentColumn+1][currentRow] = 1;
+			//If facing south, row below, same column is black
+			grid[currentColumn][currentRow-1] = 1;
 		}
 	else
 		{
@@ -133,11 +135,9 @@ void changeDirection()
 	//Reverse back to centre of the cell and change direction
 	reverse();
 	
-	randomly generate left or right turn
+	//randomly generate left or right turn
 	num = rand() % tright + tleft;
-	
-	//check bounds
-	bounds();
+
 	if (num == 2)
 	{
 		//turn left
@@ -149,17 +149,79 @@ void changeDirection()
 		right();
 	}//end if
 }
-/*
+
 void bounds()
 {
-	if(currentColumn < 0 || currentColumn > 7 || currentRow < 0 || currentRow > 9)
+	if(currentColumn == 1)
 	{
-		left();
+		if(direction == 3)
+		{
+			reverse();
+			left();
+			updateObstacleMap();
+		}//end 1s inner if
+		
+		if(direction == 4)
+		{
+			reverse();
+			right();
+			updateObstacleMap();
+		}//end 2nd inner if
+	}//end if
+	
+	if(currentColumn == 10)
+	{
+		if(direction == 3)
+		{
+			reverse();
+			left();
+			updateObstacleMap();
+		}//end 1s inner if
+		
+		if(direction == 4)
+		{
+			reverse();
+			right();
+			updateObstacleMap();
+		}//end 2nd inner if
+	}//end if
+	
+	if(currentRow == 1)
+	{
+		if(direction == 3)
+		{
+			reverse();
+			right();
+			updateObstacleMap();
+		}//end 1s inner if
+		
+		if(direction == 4)
+		{
+			reverse();
+			left();
+			updateObstacleMap();
+		}//end 2nd inner if
+	}//end if
+	
+	if(currentRow == 8)
+	{
+		if(direction == 3)
+		{
+			reverse();
+			left();
+			updateObstacleMap();
+		}//end 1s inner if
+		
+		if(direction == 4)
+		{
+			reverse();
+			right();
+			updateObstacleMap();
+		}//end 2nd inner if
 	}//end if
 }//end bounds()
-*/
+
 	
-/*
 void moveToCentre()
 {
 	nMotorEncoder[motorB] = 0;
@@ -176,21 +238,23 @@ void moveToCentre()
 	}
 	else if (direction == 2)
 	{
-		currentRow = currentRow + 1;
+		
+		currentColumn = currentColumn+1;
 	}
 	else if (direction == 3)
 	{
-		currentColumn = currentColumn+1;
+		currentRow = currentRow + 1;
 	}
 	else
 	{
 		currentColumn = currentColumn-1;
 	}
-	nxtDisplayClearTextLine(4);
-	nxtDisplayCenteredTextLine(4, "Col: %d, Row: %d",currentColumn, currentRow);
-	wait1Msec(250);
+	//nxtDisplayClearTextLine(4);
+	//nxtDisplayCenteredTextLine(4, "Col: %d, Row: %d",currentColumn, currentRow);
+	//wait1Msec(250);
 }//end moveToCentre()
-*/
+
+
 void moveToEdge(void)
 {
 	//move a tiny bit
@@ -213,9 +277,20 @@ void reverse(void)
 
 void left(void)
 {
-	motor[motorB] = -50;
-	motor[motorC] = 50;
-	wait1Msec(324);
+	nMotorPIDSpeedCtrl[motorB] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[motorC] = mtrSpeedReg;
+	nMotorEncoder[motorB] = 0;
+	nMotorEncoder[motorC] = 0;
+	nMotorEncoderTarget[motorB] = 185;
+	nMotorEncoderTarget[motorC] = -18;
+	motor[motorB] = 50;
+	motor[motorC] = -50;
+
+	while(nMotorRunState[motorC] != runStateIdle)
+	{}
+
+	motor[motorB] = 0;
+	motor[motorC] = 0;
 	
 	// Change facing direction
 	direction--;
@@ -230,9 +305,20 @@ void left(void)
 
 void right(void)
 {
-	motor[motorB] = 50;
-	motor[motorC] = -50;
-	wait1Msec(324);
+	nMotorPIDSpeedCtrl[motorB] = mtrSpeedReg;
+	nMotorPIDSpeedCtrl[motorC] = mtrSpeedReg;
+	nMotorEncoder[motorB] = 0;
+	nMotorEncoder[motorC] = 0;
+	nMotorEncoderTarget[motorB] = 185;
+	nMotorEncoderTarget[motorC] = -185;
+	motor[motorB] = -50;
+	motor[motorC] = 50;
+
+	while(nMotorRunState[motorC] != runStateIdle)
+	{}
+
+	motor[motorB] = 0;
+	motor[motorC] = 0;
 	
 	// Change facing direction
 	direction++;

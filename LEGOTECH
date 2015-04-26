@@ -21,7 +21,7 @@ void left(void);
 void right(void);
 
 // declaring grid & global variables
-int grid[9][11];
+int grid[7][9];
 int currentColumn = 1;
 int currentRow = 4;
 int tleft = 2; //turn left
@@ -44,14 +44,13 @@ task main()
 	thresholdValue = 40;
 	int i, j;
 	
-
 	while(true)
 	{
 		// 0 is white, 99 is start
 		// initialise our grid
-		for(i = 0; i < 9; i++)
+		for(i = 0; i < 7; i++)
 		{
-			for(j = 0; j < 11; j++)
+			for(j = 0; j < 9; j++)
 			{
 				grid[i][j] = 0;
 			}
@@ -91,18 +90,28 @@ void navigateGrid(void)
 					while(direction == 1 && currentRow == 0)
 					{
 						changeDirection();
+						right();
 					}//end while
 					
 					//facing east
-					while(direction == 2 && currentColumn == 11)
+					while(direction == 2 && currentColumn == 9)
 					{
 						changeDirection();
+						right();
 					}//end while
 					
 					//facing south
-					while(direction == 2 && currentColumn == 10)
+					while(direction == 3 && currentColumn == 9)
 					{
 						changeDirection();
+						right();
+					}//end while
+					
+					//facing west
+					while(direction == 4 && currentRow == 0)
+					{
+						changeDirection();
+						right();
 					}//end while
 					
 				}//end if

@@ -29,6 +29,7 @@ int currentRow = 3;
 int tleft = 2; //turn left
 int tright = 3; //turn right
 int num; //for random turning left or right
+
 /* directions:
 	 1 is north
 	 3 is south
@@ -37,6 +38,7 @@ int num; //for random turning left or right
 */
 int direction = 3;
 int thresholdValue;
+
 //to help with turns so it wont "array out of bounds", left = 4, right = 6;
 int lastTurn = 4;
 int objectCounter;
@@ -77,7 +79,7 @@ task main()
 
 void navigateGrid(void)
 {
-		while(SensorValue(lightSensor) > 40)
+		while(SensorValue(lightSensor) > 40) //when white square keep going forward
 		{
 			motor[motorB] = 50;
 			motor[motorC] = 50;
@@ -188,7 +190,7 @@ void changeDirection()
 	}//end if
 }
 
-void bounds()
+void bounds() //detects whether the robot is at the edge of the map by which part of the array its at
 {
 	if(currentColumn == 1)
 	{
@@ -260,7 +262,7 @@ void bounds()
 }//end bounds()
 
 	
-void moveToCentre()
+void moveToCentre() //move to centre of block
 {
 	nMotorEncoder[motorB] = 0;
 	nMotorEncoder[motorC] = 0;
@@ -310,7 +312,7 @@ void reverse(void)
 	wait1Msec(175);
 }
 
-void left(void)
+void left(void) //make left turn
 {
 	nMotorPIDSpeedCtrl[motorB] = mtrSpeedReg;
 	nMotorPIDSpeedCtrl[motorC] = mtrSpeedReg;
@@ -338,7 +340,7 @@ void left(void)
 	lastTurn = 4;
 }//end left()
 
-void right(void)
+void right(void) //make a right turn
 {
 	nMotorPIDSpeedCtrl[motorB] = mtrSpeedReg;
 	nMotorPIDSpeedCtrl[motorC] = mtrSpeedReg;
@@ -366,7 +368,7 @@ void right(void)
 	lastTurn = 6;
 }//end right()
 
-void reverseToCentre(void)
+void reverseToCentre(void) //go backwards to cetnre block
 {
 	nMotorEncoder[motorB] = 0;
 	nMotorEncoder[motorC] = 0;
@@ -395,7 +397,7 @@ void reverseToCentre(void)
 	}	
 }//end reverseToCentre()
 
-void objectStart(void)
+void objectStart(void)//go back to the start
 {
 	while( grid != 99)
 	{
